@@ -6,6 +6,8 @@ import { CustomWiggle } from 'gsap/CustomWiggle'
 gsap.registerPlugin(CustomEase, CustomWiggle)
 
 const screen = document.querySelector('.screen'),
+      button = document.querySelector('.senses_button'),
+      shadow = document.querySelector('.screen_shadow'),
       speedText = screen.querySelector('.speed_text'),
       speedGauge = document.getElementById('speed'),
       powerGauge = document.getElementById('power'),
@@ -14,6 +16,7 @@ const screen = document.querySelector('.screen'),
       ease = 'expo.out'
 
 CustomWiggle.create('shake', { wiggles: 600 })
+CustomWiggle.create('blur', { wiggles: 800, type: 'random' })
 
 export function senses() {
 
@@ -21,12 +24,12 @@ export function senses() {
         rpm = rpmTimeline(),
         shake = shakeTimeline()
 
-  screen.addEventListener('pointerdown', () => {
+  button.addEventListener('pointerdown', () => {
     accelerate.timeScale(1).play()
     rpm.timeScale(1).play()
     shake.play()
   })
-  screen.addEventListener('pointerup', () => {
+  button.addEventListener('pointerup', () => {
     accelerate.timeScale(0.5).reverse()
     rpm.timeScale(0.3).reverse()
     shake.progress(0).pause()
@@ -68,6 +71,7 @@ function rpmTimeline() {
     paused: true,
     defaults: {
       duration: 0.4,
+      ease: 'expo.inOut'
     },
     onUpdate: () => {
       const progress = timeline.progress();
@@ -84,13 +88,17 @@ function rpmTimeline() {
     strokeDashoffset: 0,
   })
   .from(screen, {
-    scale: 0.9,
-    ease: 'expo.out'
+    scale: 0.92,
+    filter: 'brightness(0.9)',
   }, 0)
   .to(background, {
+    scale: 0.8,
+    autoAlpha: 0.5,
+  }, 0)
+  .to(shadow, {
+    filter: 'blur(120px)',
     scale: 1.2,
-    ease: 'expo.out',
-    filter: 'blur(80px)'
+    backgroundColor: '#ff0300',
   }, 0)
 
   return timeline
@@ -106,10 +114,15 @@ function shakeTimeline() {
     }
   })
   timeline.to(screen, {
-    y: 1,
+    x: 1,
+    // rotation: 0.1,
   })
+  .to(screen, {
+    filter: 'blur(2px)',
+    ease: 'blur',
+  }, 0)
   .to(background, {
-    x: -2,
+    y: -8,
   }, 0)
 
   return timeline

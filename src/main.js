@@ -1,6 +1,8 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+import { senses } from './features/senses'
+
 gsap.registerPlugin(ScrollTrigger)
 
 // Vars
@@ -195,6 +197,7 @@ mm.add(
       animateRotation()
       timelineAnimation()
       timelineEntrance()
+      senses()
       ScrollTrigger.refresh()
     })
   }

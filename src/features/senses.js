@@ -114,15 +114,12 @@ function shakeTimeline() {
     }
   })
   timeline.to(screen, {
-    x: 1,
-    // rotation: 0.1,
+    x: 0.5,
+    rotation: 0.1,
   })
   .to(screen, {
-    filter: 'blur(2px)',
+    filter: 'blur(1.5px)',
     ease: 'blur',
-  }, 0)
-  .to(background, {
-    y: -8,
   }, 0)
 
   return timeline

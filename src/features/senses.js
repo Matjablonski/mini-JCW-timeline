@@ -5,14 +5,21 @@ import { CustomWiggle } from 'gsap/CustomWiggle'
 
 gsap.registerPlugin(CustomEase, CustomWiggle)
 
+const screen = document.querySelector('.screen'),
+      speedText = screen.querySelector('.speed_text'),
+      speedGauge = document.getElementById('speed'),
+      powerGauge = document.getElementById('power'),
+      needle = screen.querySelector('.needle_wrap'),
+      background = document.querySelector('.senses_background'),
+      ease = 'expo.out'
+
+CustomWiggle.create('shake', { wiggles: 600 })
+
 export function senses() {
-  const screen = document.querySelector('.screen'),
-    speedText = screen.querySelector('.speed_text'),
-    speedGauge = document.getElementById('speed'),
-    powerGauge = document.getElementById('power'),
-    needle = screen.querySelector('.needle_wrap'),
-    background = document.querySelector('.senses_background'),
-    ease = 'expo.out'
+
+  const accelerate = accelerateTimeline(),
+        rpm = rpmTimeline(),
+        shake = shakeTimeline()
 
   screen.addEventListener('pointerdown', () => {
     accelerate.timeScale(1).play()
@@ -25,7 +32,12 @@ export function senses() {
     shake.progress(0).pause()
   })
 
-  const accelerate = gsap.timeline({ 
+}
+
+// Timelines
+
+function accelerateTimeline() {
+  const timeline = gsap.timeline({ 
     paused: true,
     defaults: {
       duration: 30,
@@ -33,12 +45,12 @@ export function senses() {
     },
     onUpdate: () => {
       const parseEase = gsap.parseEase(ease);
-      const easedProgress = parseEase(accelerate.progress());
+      const easedProgress = parseEase(timeline.progress());
       const currentSpeed = Math.round(easedProgress * 220);
       speedText.textContent = currentSpeed;
     }
   })
-  accelerate.fromTo(needle, {
+  timeline.fromTo(needle, {
     rotation: -134,
   }, {
     rotation: 136,
@@ -47,16 +59,28 @@ export function senses() {
     strokeDashoffset: 0
   }, 0)
 
-  CustomWiggle.create('shake', { wiggles: 600 })
+  return timeline
+}
 
-  const rpm = gsap.timeline({ 
+function rpmTimeline() {
+  const arrows = screen.querySelectorAll('.power_arrows .arrow')
+  const timeline = gsap.timeline({ 
     paused: true,
     defaults: {
       duration: 0.4,
-      // ease: 'power2.inOut',
+    },
+    onUpdate: () => {
+      const progress = timeline.progress();
+      const total = arrows.length;
+      const activeIndex = Math.min(Math.floor(progress * total), total - 1);
+
+      arrows.forEach((arrow, i) => {
+        arrow.classList.toggle('is-active', i <= activeIndex);
+        arrow.classList.toggle('is-red', i === activeIndex);
+      });
     }
   })
-  rpm.to(powerGauge, {
+  timeline.to(powerGauge, {
     strokeDashoffset: 0,
   })
   .from(screen, {
@@ -69,7 +93,11 @@ export function senses() {
     filter: 'blur(80px)'
   }, 0)
 
-  const shake = gsap.timeline({
+  return timeline
+}
+
+function shakeTimeline() {
+  const timeline = gsap.timeline({
     paused: true,
     repeat: -1,
     defaults: {
@@ -77,11 +105,12 @@ export function senses() {
       duration: 30,
     }
   })
-  shake.to(screen, {
+  timeline.to(screen, {
     y: 1,
   })
   .to(background, {
     x: -2,
   }, 0)
 
+  return timeline
 }

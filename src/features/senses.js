@@ -13,7 +13,7 @@ const screen = document.querySelector('.screen'),
       powerGauge = document.getElementById('power'),
       needle = screen.querySelector('.needle_wrap'),
       background = document.querySelector('.senses_background'),
-      ease = 'expo.out'
+      ease = 'power4.out'
 
 CustomWiggle.create('shake', { wiggles: 600 })
 CustomWiggle.create('blur', { wiggles: 800, type: 'random' })
@@ -30,7 +30,12 @@ export function senses() {
     shake.play()
   })
   button.addEventListener('pointerup', () => {
-    accelerate.timeScale(0.5).reverse()
+    if (accelerate.progress() >= 0.3) {
+      console.log('you are too fast!')
+      accelerate.timeScale(5).reverse()
+    } else {
+      accelerate.timeScale(0.5).reverse()
+    }
     rpm.timeScale(0.3).reverse()
     shake.progress(0).pause()
   })
@@ -43,7 +48,7 @@ function accelerateTimeline() {
   const timeline = gsap.timeline({ 
     paused: true,
     defaults: {
-      duration: 30,
+      duration: 40,
       ease: ease,
     },
     onUpdate: () => {
